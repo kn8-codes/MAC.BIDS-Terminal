@@ -1,20 +1,42 @@
-# MAC.BID Terminal
+# sv
 
-Bloomberg Terminal-style arbitrage dashboard for MAC.BID liquidation auctions.
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
-**Stack:** SvelteKit + Supabase + Vercel  
-**Status:** Active development  
-**Repo:** github.com/kn8-codes/macbid-terminal
+## Creating a project
 
-## Setup
+If you're seeing this, you've probably already done this step. Congrats!
 
-```bash
-npm install
-cp .env.example .env
-# fill in .env with your Supabase credentials
-npm run dev
+```sh
+# create a new project
+npx sv create my-app
 ```
 
-## Docs
+To recreate this project with the same configuration:
 
-See `docs/` for project spec and session notes.
+```sh
+# recreate this project
+npx sv@0.15.0 create --template minimal --types ts --install npm .
+```
+
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+
+```sh
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+To create a production version of your app:
+
+```sh
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
