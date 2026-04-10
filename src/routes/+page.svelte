@@ -10,6 +10,7 @@
 
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { startPoller, stopPoller } from '$lib/utils/poller';
   import { lots, tickerItems } from '$lib/stores/lots';
   import {
     portfolio,
@@ -281,11 +282,16 @@
   ];
 
   onMount(() => {
-    lots.set(MOCK_LOTS);
-    portfolio.set(MOCK_PORTFOLIO);
+    portfolio.set(MOCK_PORTFOLIO);  // keep mock portfolio until Supabase is wired
 
-    const id = setInterval(() => { clock = new Date(); }, 1000);
-    return () => clearInterval(id);
+    const clockId = setInterval(() => { clock = new Date(); }, 1000);
+
+    startPoller();  // 🟢 live MAC.BID data — replaces MOCK_LOTS
+
+    return () => {
+      clearInterval(clockId);
+      stopPoller();
+    };
   });
 
   // Feed: all open lots sorted by closing time (uses $lots directly
@@ -342,7 +348,7 @@
       <div class="zone-header">
         <span class="zone-title">DEAL FEED</span>
         <span class="zone-meta">
-          {$lots.filter(l => l.is_open).length} LOTS · MOCK DATA · SORTED BY CLOSE TIME
+          {$lots.filter(l => l.is_open).length} LOTS · LIVE · SORTED BY CLOSE TIME
         </span>
       </div>
 
@@ -366,7 +372,7 @@
               {@const urgent = isUrgent(lot.expected_closing_utc ?? 0)}
               {@const hasBid = $activeBids.some(e => e.lot_id === lot.id)}
               {@const bidEntry = $activeBids.find(e => e.lot_id === lot.id)}
-              <tr class:urgent>
+              <tr class:urgent onclick={() => window.open(`https://mac.bid/lot/${lot.id}`, "_blank")} style="cursor: pointer;">
                 <td class="td-lot">{lot.lot_number}</td>
 
                 <td class="td-product">
