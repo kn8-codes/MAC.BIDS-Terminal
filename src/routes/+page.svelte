@@ -351,7 +351,7 @@
       <div class="ticker-track" style="animation-duration: {$tickerItems.length * 6}s">
         {#each [...$tickerItems, ...$tickerItems] as item, i (i)}
           {@const urgent = isUrgent(item.expected_closing_utc)}
-          <span class="t-item">
+          <a class="t-item" href="https://mac.bid/lot/{item.lot_id}" target="_blank" rel="noopener noreferrer">
             <span class="t-lot">{item.lot_number}</span>
             <span class="t-sep">·</span>
             <span class="t-name">{item.product_name.slice(0, 32)}</span>
@@ -362,7 +362,7 @@
             <span class="t-score" style="color:{scoreColor(item.score)}">[{fmtScore(item.score)}]</span>
             <span class="t-time" class:t-urgent={urgent}>{fmtCountdown(item.expected_closing_utc)}</span>
             <span class="t-div">▸</span>
-          </span>
+          </a>
         {/each}
       </div>
     </div>
@@ -668,6 +668,8 @@
   }
 
   .t-lot   { color: var(--muted); font-size: 12px; }
+  a.t-item { text-decoration: none; color: inherit; }
+  a.t-item:hover .t-name { color: var(--text); }
   .t-sep   { color: rgba(100, 116, 139, 0.35); }
   .t-name  { color: var(--text); }
   .t-bid   { color: var(--muted); font-variant-numeric: tabular-nums; }
