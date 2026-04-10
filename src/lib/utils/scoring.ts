@@ -69,7 +69,7 @@ export function score(input: ScoringInput): ScoringResult {
 
 // Quick sanity check — run with: npx tsx src/lib/utils/scoring.ts
 // Seed lot: retail $199.99, eBay comp ~$120, current bid $15, shipping $12
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (typeof process !== 'undefined' && import.meta.url === `file://${process.argv[1]}`) {
   const result = score({
     current_bid:        15,
     ebay_comp_price:    120,

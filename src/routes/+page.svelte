@@ -282,11 +282,12 @@
   ];
 
   onMount(() => {
-    portfolio.set(MOCK_PORTFOLIO);  // keep mock portfolio until Supabase is wired
+    lots.set(MOCK_LOTS);            // seed with mock data — poller overwrites on first poll
+    portfolio.set(MOCK_PORTFOLIO);
 
     const clockId = setInterval(() => { clock = new Date(); }, 1000);
 
-    startPoller();  // 🟢 live MAC.BID data — replaces MOCK_LOTS
+    startPoller();  // 🟢 live MAC.BID data — overwrites mock lots when first poll completes
 
     return () => {
       clearInterval(clockId);
