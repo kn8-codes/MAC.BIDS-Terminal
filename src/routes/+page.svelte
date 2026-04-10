@@ -668,8 +668,9 @@
   }
 
   .t-lot   { color: var(--muted); font-size: 12px; }
-  a.t-item { text-decoration: none; color: inherit; }
-  a.t-item:hover .t-name { color: var(--text); }
+  a.t-item { text-decoration: none; color: inherit; transition: all 0.1s ease; }
+  a.t-item:hover { font-weight: 600; letter-spacing: 0.02em; color: var(--text); }
+  a.t-item:hover .t-lot { color: var(--green); }
   .t-sep   { color: rgba(100, 116, 139, 0.35); }
   .t-name  { color: var(--text); }
   .t-bid   { color: var(--muted); font-variant-numeric: tabular-nums; }
