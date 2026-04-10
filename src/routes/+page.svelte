@@ -27,6 +27,25 @@
   // ── CLOCK ─────────────────────────────────────────────────────
   let clock = $state(new Date());
 
+  // ── SORT STATE ────────────────────────────────────────────────
+  type SortKey = 'lot_number' | 'product_name' | 'category' | 'condition_name' | 'current_bid' | 'local_max_bid' | 'score' | 'expected_closing_utc';
+  let sortKey = $state<SortKey>('expected_closing_utc');
+  let sortDir = $state<1 | -1>(1);  // 1 = asc, -1 = desc
+
+  function setSort(key: SortKey) {
+    if (sortKey === key) {
+      sortDir = sortDir === 1 ? -1 : 1;
+    } else {
+      sortKey = key;
+      sortDir = key === 'expected_closing_utc' ? 1 : -1;  // time asc, everything else desc by default
+    }
+  }
+
+  function sortIcon(key: SortKey): string {
+    if (sortKey !== key) return '↕';
+    return sortDir === 1 ? '↑' : '↓';
+  }
+
   // ── HELPERS ───────────────────────────────────────────────────
   const ageMs = (days: number) =>
     new Date(Date.now() - days * 86_400_000).toISOString();
@@ -300,7 +319,17 @@
   function feedLots(all: Lot[]): Lot[] {
     return [...all]
       .filter(l => l.is_open)
-      .sort((a, b) => (a.expected_closing_utc ?? 0) - (b.expected_closing_utc ?? 0));
+      .sort((a, b) => {
+        let av: string | number | null = a[sortKey] ?? null;
+        let bv: string | number | null = b[sortKey] ?? null;
+        if (av === null && bv === null) return 0;
+        if (av === null) return 1;
+        if (bv === null) return -1;
+        if (typeof av === 'string' && typeof bv === 'string') {
+          return av.localeCompare(bv) * sortDir;
+        }
+        return ((av as number) - (bv as number)) * sortDir;
+      });
   }
 </script>
 
@@ -357,14 +386,14 @@
         <table class="feed-table">
           <thead>
             <tr>
-              <th>LOT #</th>
-              <th>PRODUCT</th>
-              <th>CAT</th>
-              <th>COND</th>
-              <th class="th-r">BID</th>
-              <th class="th-r">LOCAL MAX</th>
-              <th>SCORE</th>
-              <th>CLOSES IN</th>
+              <th class:th-sorted={sortKey === 'lot_number'} onclick={() => setSort('lot_number')}>LOT # <span class="sort-icon">{sortIcon('lot_number')}</span></th>
+              <th class:th-sorted={sortKey === 'product_name'} onclick={() => setSort('product_name')}>PRODUCT <span class="sort-icon">{sortIcon('product_name')}</span></th>
+              <th class:th-sorted={sortKey === 'category'} onclick={() => setSort('category')}>CAT <span class="sort-icon">{sortIcon('category')}</span></th>
+              <th class:th-sorted={sortKey === 'condition_name'} onclick={() => setSort('condition_name')}>COND <span class="sort-icon">{sortIcon('condition_name')}</span></th>
+              <th class="th-r" class:th-sorted={sortKey === 'current_bid'} onclick={() => setSort('current_bid')}>BID <span class="sort-icon">{sortIcon('current_bid')}</span></th>
+              <th class="th-r" class:th-sorted={sortKey === 'local_max_bid'} onclick={() => setSort('local_max_bid')}>LOCAL MAX <span class="sort-icon">{sortIcon('local_max_bid')}</span></th>
+              <th class:th-sorted={sortKey === 'score'} onclick={() => setSort('score')}>SCORE <span class="sort-icon">{sortIcon('score')}</span></th>
+              <th class:th-sorted={sortKey === 'expected_closing_utc'} onclick={() => setSort('expected_closing_utc')}>CLOSES IN <span class="sort-icon">{sortIcon('expected_closing_utc')}</span></th>
               <th></th>
             </tr>
           </thead>
@@ -751,6 +780,11 @@
   }
 
   .feed-table thead .th-r { text-align: right; }
+  .feed-table thead th { cursor: pointer; user-select: none; }
+  .feed-table thead th:hover { color: var(--text); }
+  .feed-table thead th.th-sorted { color: var(--green); }
+  .sort-icon { opacity: 0.4; font-size: 8px; margin-left: 3px; }
+  .th-sorted .sort-icon { opacity: 1; }
 
   .feed-table tbody td {
     padding: 8px 10px;
